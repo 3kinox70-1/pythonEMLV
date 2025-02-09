@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combat</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        function attaquer(cible) {
+            fetch('/attaque', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `cible=${cible}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                const messageElement = document.getElementById("message");
+                messageElement.textContent = data.message;
+
+                if (data.gagnant) {
+                    document.body.innerHTML = `<h1>${data.message}</h1>`;
+                } else {
+                    const cibleElement = document.getElementById(`adversaire-${cible}`);
+                    if (data.pv_cible <= 0) {
+                        cibleElement.remove();
+                    } else {
+                        const pvElement = cibleElement.querySelector(".pv");
+                        if (pvElement) {
+                            pvElement.textContent = `${data.pv_cible} PV`;
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Combat</h1>
+
+    <div class="joueur">
+        <h2>Votre personnage : {{ joueur.nom }}</h2>
+        <p>Classe : {{ joueur.classe }}</p>
+        <p>Vie : {{ joueur.vie }} PV</p>
+        <p>Attaque : {{ joueur.attaque }}</p>
+    </div>
+
+    <h2>Adversaires :</h2>
+    <div id="message" style="margin: 20px 0; font-weight: bold; color: red;"></div>
+    <div class="adversaires">
+        {% for adversaire in adversaires %}
+        <div class="adversaire" id="adversaire-{{ adversaire.nom }}">
+            <h3>{{ adversaire.nom }}</h3>
+            <p class="pv">{{ adversaire.vie }} PV</p>
+            <p>Attaque : {{ adversaire.attaque }}</p>
+            <button onclick="attaquer('{{ adversaire.nom }}')">Attaquer</button>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

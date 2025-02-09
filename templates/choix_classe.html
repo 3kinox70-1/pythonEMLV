@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choix de Classe</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        function choisirClasse(classe) {
+            fetch('/choisir_classe', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `classe=${classe}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (!data.error) {
+                    window.location.href = '/jeu';
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Choisissez votre classe</h1>
+    <div class="classe-selection">
+        <div class="classe-card">
+            <h2>Guerrier</h2>
+            <p>Charge féroce : +3 d'attaque pendant un tour.</p>
+            <button onclick="choisirClasse('Guerrier')">Sélectionner</button>
+        </div>
+        <div class="classe-card">
+            <h2>Mage</h2>
+            <p>Boule de feu : attaque magique infligeant des dégâts de zone.</p>
+            <button onclick="choisirClasse('Mage')">Sélectionner</button>
+        </div>
+        <div class="classe-card">
+            <h2>Archer</h2>
+            <p>Flèche perçante : ignore une partie de l'armure de l'adversaire.</p>
+            <button onclick="choisirClasse('Archer')">Sélectionner</button>
+        </div>
+    </div>
+</body>
+</html>
