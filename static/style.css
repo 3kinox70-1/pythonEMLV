@@ -90,3 +90,11 @@ button:hover {
     border-radius: 5px;
     cursor: pointer;
 }
+
+.adversaire {
+    border: 1px solid #ffcc00;
+    border-radius: 5px;
+    max-width: 500px;
+    margin: auto;
+    padding: 10px;
+}
