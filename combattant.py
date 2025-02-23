@@ -16,18 +16,18 @@ class Guerrier(Combattant):
         super().__init__(nom, vie=50, attaque=7)
     
     def capacite_speciale(self):
-        return "Charge féroce : +3 d'attaque pendant un tour."
+        return "Rien de spécial juste un mec chill."
 
 class Mage(Combattant):
     def __init__(self, nom):
-        super().__init__(nom, vie=30, attaque=10)
+        super().__init__(nom, vie=30, attaque=12)
     
     def capacite_speciale(self):
-        return "Boule de feu : attaque magique infligeant des dégâts de zone."
+        return "Attaque plus puissante : 12 de dégâts."
 
 class Archer(Combattant):
     def __init__(self, nom):
-        super().__init__(nom, vie=70, attaque=50)
+        super().__init__(nom, vie=70, attaque=5)
     
     def capacite_speciale(self):
         return "Plein de vie : nul en attaque mais 70 PV."
