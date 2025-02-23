@@ -22,4 +22,4 @@ pip install Jinja2
 
 pip install Flask-Session
 
-Ce projet a été réalisé par Aïcha EL HAMED, Taaha SULEMAN, Yoshika ARICHANDRA, Steve DEMENITROUX-BOISSIN.
+Ce projet a été réalisé par Aïcha EL HAMED, Taaha SULEMAN, Yoshika ARICHANDRA, Warsame MOUSSA OUFANE, Steve DEMENITROUX-BOISSIN.
