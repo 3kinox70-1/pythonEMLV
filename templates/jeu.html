@@ -14,11 +14,13 @@
             })
             .then(response => response.json())
             .then(data => {
-                const messageElement = document.getElementById("message");
-                messageElement.textContent = data.message;
+                const messageElement = document.getElementById('message');
+                messageElement.innerHTML = data.message;
 
-                if (data.gagnant) {
-                    document.body.innerHTML = `<h1>${data.message}</h1>`;
+                if (data.gagnant || data.perdu_message) {
+                    // Afficher le message de victoire/défaite
+                    const resultMessage = data.gagnant ? data.message : data.perdu_message;
+                    document.body.innerHTML = `<h1>${resultMessage}</h1><button onclick="rejouer()">Rejouer</button>`;
                 } else {
                     const cibleElement = document.getElementById(`adversaire-${cible}`);
                     if (data.pv_cible <= 0) {
@@ -29,23 +31,39 @@
                             pvElement.textContent = `${data.pv_cible} PV`;
                         }
                     }
+
+                    // Gérer la contre-attaque de l'adversaire
+                    if (data.contre_attaque) {
+                        const joueurVieElement = document.getElementById('joueur-vie');
+                        joueurVieElement.textContent = `${data.joueur_vie} PV`;
+                        messageElement.innerHTML += `<br>${data.contre_attaque}`;
+                    }
                 }
+            });
+        }
+
+        function rejouer() {
+            fetch('/rejouer', {
+                method: 'POST'
+            })
+            .then(() => {
+                window.location.href = '/';
             });
         }
     </script>
 </head>
 <body>
     <h1>Combat</h1>
+    <div id="message"></div>
 
     <div class="joueur">
         <h2>Votre personnage : {{ joueur.nom }}</h2>
         <p>Classe : {{ joueur.classe }}</p>
-        <p>Vie : {{ joueur.vie }} PV</p>
+        <p id="joueur-vie">{{ joueur.vie }} PV</p>
         <p>Attaque : {{ joueur.attaque }}</p>
     </div>
 
     <h2>Adversaires :</h2>
-    <div id="message" style="margin: 20px 0; font-weight: bold; color: red;"></div>
     <div class="adversaires">
         {% for adversaire in adversaires %}
         <div class="adversaire" id="adversaire-{{ adversaire.nom }}">

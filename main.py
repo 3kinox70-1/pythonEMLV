@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify, session
 from combattant import Guerrier, Mage, Archer
 import sqlite3
+import random
+from sauvegarde import sauvegarder
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
@@ -27,10 +29,16 @@ def index():
 @app.route('/choisir_classe', methods=['POST'])
 def choisir_classe():
     classe_nom = request.form.get('classe')
+    nom_joueur = request.form.get('nom', '').strip()
+
+    if not nom_joueur:
+        return jsonify({'error': "Le nom du joueur est requis."}), 400
+
     if classe_nom not in classes_combattants:
         return jsonify({'error': "Classe invalide"}), 400
 
-    joueur = classes_combattants[classe_nom]("Joueur")
+    # Créer le joueur avec le nom saisi
+    joueur = classes_combattants[classe_nom](nom_joueur)
     session['joueur'] = {
         'nom': joueur.nom,
         'classe': classe_nom,
@@ -43,7 +51,12 @@ def choisir_classe():
         'attaque': adv.attaque
     } for adv in generer_adversaires()]
 
-    return jsonify({'message': f"Vous avez choisi la classe {classe_nom}", 'classe': classe_nom})
+    return jsonify({'message': f"Bienvenue {nom_joueur}, vous avez choisi la classe {classe_nom}", 'classe': classe_nom})
+
+@app.route('/rejouer', methods=['POST'])
+def rejouer():
+    session.clear()  # Réinitialiser la session
+    return '', 204  # Réponse vide pour indiquer que tout est bon
 
 @app.route('/jeu')
 def jeu():
@@ -62,20 +75,58 @@ def attaque():
     attaquant_nom = joueur['nom']
     cible_nom = request.form.get('cible')
 
+    # Trouver la cible
     cible = next((adv for adv in adversaires if adv['nom'] == cible_nom), None)
     if not cible:
         return jsonify({'error': "Cible invalide"}), 400
 
+    # Le joueur attaque la cible
     cible['vie'] -= joueur['attaque']
+    message = f"{attaquant_nom} attaque {cible_nom} et inflige {joueur['attaque']} dégâts !"
 
     if cible['vie'] <= 0:
+        message += f" {cible_nom} est vaincu !"
         adversaires.remove(cible)
         if len(adversaires) == 0:
-            sauvegarder_vainqueur(joueur['nom'])
-            return jsonify({'message': f"{joueur['nom']} a gagné !", 'gagnant': True})
+            # Création de l'objet avec attribut 'pseudo' pour la sauvegarde
+            class Gagnant:
+                def __init__(self, pseudo):
+                    self.pseudo = pseudo
 
+            gagnant = Gagnant(joueur['nom'])
+            sauvegarder(gagnant)  # Appel vers sauvegarde.py
+            return jsonify({'message': f"{joueur['nom']} a gagné !", 'gagnant': True})
+    # Contre-attaque de la cible (50% de chance de rater)
+    contre_attaque_msg = ""
+    if cible and cible['vie'] > 0:
+        if random.choice([True, False]):  # 50% de chances de réussir
+            joueur['vie'] -= cible['attaque']
+            contre_attaque_msg = f"{cible_nom} riposte et inflige {cible['attaque']} dégâts à {attaquant_nom} !"
+        else:
+            contre_attaque_msg = f"{cible_nom} tente de riposter mais rate son attaque !"
+
+    # Vérifier si le joueur est mort après la contre-attaque
+    if joueur['vie'] <= 0:
+        return jsonify({
+            'message': message,
+            'contre_attaque': contre_attaque_msg,
+            'joueur_vie': joueur['vie'],
+            'perdu_message': f"{joueur['nom']} a été vaincu. Game Over.",
+            'pv_cible': cible['vie'] if cible else 0
+        })
+
+    # Sauvegarder les modifications dans la session
+    session['joueur'] = joueur
     session['adversaires'] = adversaires
-    return jsonify({'message': f"{attaquant_nom} attaque {cible_nom}!", 'pv_cible': cible['vie']})
+
+    # Retourner les informations mises à jour
+    return jsonify({
+        'message': message,
+        'contre_attaque': contre_attaque_msg,
+        'joueur_vie': joueur['vie'],
+        'pv_cible': cible['vie'] if cible else 0
+    })
+
 
 def sauvegarder_vainqueur(nom):
     con = sqlite3.connect("jeu.db")

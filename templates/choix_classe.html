@@ -7,15 +7,22 @@
     <link rel="stylesheet" href="/static/style.css">
     <script>
         function choisirClasse(classe) {
+            const nomJoueur = document.getElementById('nom-joueur').value.trim();
+            if (!nomJoueur) {
+                alert("Veuillez entrer votre nom !");
+                return;
+            }
+
             fetch('/choisir_classe', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `classe=${classe}`
+                body: `classe=${classe}&nom=${nomJoueur}`
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.message);
-                if (!data.error) {
+                if (data.error) {
+                    alert(data.error);
+                } else {
                     window.location.href = '/jeu';
                 }
             });
@@ -23,7 +30,13 @@
     </script>
 </head>
 <body>
-    <h1>Choisissez votre classe</h1>
+    <h1>Choisissez votre classe et entrez votre nom</h1>
+
+    <div>
+        <label for="nom-joueur">Nom du joueur :</label>
+        <input type="text" id="nom-joueur" placeholder="Entrez votre nom">
+    </div>
+
     <div class="classe-selection">
         <div class="classe-card">
             <h2>Guerrier</h2>
@@ -37,7 +50,7 @@
         </div>
         <div class="classe-card">
             <h2>Archer</h2>
-            <p>Flèche perçante : ignore une partie de l'armure de l'adversaire.</p>
+            <p>Plein de vie : nul en attaque mais 70 PV.</p>
             <button onclick="choisirClasse('Archer')">Sélectionner</button>
         </div>
     </div>

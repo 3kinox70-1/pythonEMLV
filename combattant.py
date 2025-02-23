@@ -27,7 +27,7 @@ class Mage(Combattant):
 
 class Archer(Combattant):
     def __init__(self, nom):
-        super().__init__(nom, vie=40, attaque=6)
+        super().__init__(nom, vie=70, attaque=50)
     
     def capacite_speciale(self):
-        return "Flèche perçante : ignore une partie de l'armure de l'adversaire."
+        return "Plein de vie : nul en attaque mais 70 PV."
