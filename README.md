@@ -2,6 +2,8 @@
 
 # Ce projet a été réalisé dans le cadre du cours d'initiation à Python en Master MSID.
 
+Lien de la démo https://youtu.be/2Ge5TDmj-DI
+
 Le but de ce projet est de créer un jeu simpliste permettant au joueur de choisir un pseudo et sélectionner un personnage pour ensuite attaquer ses adversaires. Chaque personnage à sa spécificité tout comme les adversaires. Le choix de sa classe est donc important.
 Dans le jeu, il y a aussi une partie aléatoire. En effet, la riposte des ennemis est "randomisée", ils peuvent donc manquer leurs coups.
 
@@ -23,3 +25,4 @@ pip install Jinja2
 pip install Flask-Session
 
 Ce projet a été réalisé par Aïcha EL HAMED, Taaha SULEMAN, Yoshika ARICHANDRA, Warsame MOUSSA OUFANE, Steve DEMENITROUX-BOISSIN.
+
